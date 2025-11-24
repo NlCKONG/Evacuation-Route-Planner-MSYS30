@@ -2,6 +2,32 @@ from classes import *
 
 import tkinter as tk
 from tkinter import ttk
+from PIL import Image, ImageTk
+
+
+#GUI
+root = tk.Tk()
+root.title("ADMU Evacuation Route Planner")
+
+campus_map = Image.open("Ateneo College Map.jpg")
+campus_map = campus_map.resize((800, 600))
+campus_map_tk = ImageTk.PhotoImage(campus_map)
+
+input_frame = ttk.Frame(root, padding="10")
+input_frame.grid(row=0, column=0, sticky=(tk.W, tk.E))
+
+ttk.Label(
+    input_frame,
+    text="Click a RED node to select your starting location and find the shortest evacuation route.",
+    font=('Arial', 10, 'bold')
+).grid(row=0, column=0, padx=5, pady=5)
+
+result_label = ttk.Label(input_frame, text="Awaiting selection...", padding="10")
+result_label.grid(row=1, column=0, sticky=(tk.W, tk.E))
+
+map_canvas = tk.Canvas(root, width=800, height=600, bg="white")
+map_canvas.grid(row=2, column=0, padx=10, pady=10)
+
 # Ensure all your graph classes/functions are included here
 
 # --- Drawing Functions ---
@@ -10,6 +36,11 @@ def draw_nodes_and_edges():
     """Draws the entire graph on the canvas."""
     map_canvas.delete("all") # Clear previous drawings
 
+    #Background
+    map_canvas.create_image(0, 0, image=campus_map_tk, anchor="nw", tags = "bg")
+
+    map_canvas.tag_lower("bg")
+    
     # 1. Draw Edges (Simple straight lines between coordinates)
     for u, v, _ in EDGE_LIST:
         x1, y1 = NODE_POSITIONS[u]
@@ -28,7 +59,9 @@ def draw_nodes_and_edges():
         )
         
         # Add the label
-        map_canvas.create_text(x + NODE_RADIUS + 5, y, text=key, tags=(key, "label"))
+        map_canvas.create_text(
+            x + NODE_RADIUS + 5, 
+            y, text=key, tags=(key, "label"))
 
 # --- Pathfinding and Display Logic ---
 
@@ -118,28 +151,22 @@ def handle_canvas_click(event):
                     map_canvas.delete("path_line") # Clear path
                 
                 return # Stop after finding the node
+            
+    print("LEFT CLICK:", event.x, event.y)
 
-# --- GUI Setup ---
-root = tk.Tk()
-root.title("ADMU Evacuation Route Planner")
 
-# Frame for Inputs and Results
-input_frame = ttk.Frame(root, padding="10")
-input_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+#Clicks
+map_canvas.bind("<Button-1>", handle_canvas_click)
 
-ttk.Label(input_frame, text="Click a RED node to select your starting location and find the shortest evacuation route.", font=('Arial', 10, 'bold')).grid(row=0, column=0, padx=5, pady=5, sticky=tk.W)
+def print_coords(event):
+    print("Right click at:", event.x, event.y)
 
-result_label = ttk.Label(input_frame, text="Awaiting selection...", padding="10")
-result_label.grid(row=1, column=0, sticky=(tk.W, tk.E))
+map_canvas.bind("<Button-3>", print_coords)
 
-# Map Canvas
-map_canvas = tk.Canvas(root, width=800, height=600, bg="white")
-map_canvas.grid(row=2, column=0, padx=10, pady=10)
-
-# Bind the left mouse button click event to the handler function
-map_canvas.bind('<Button-1>', handle_canvas_click)
 
 # Initial drawing of the graph
 draw_nodes_and_edges()
+
+
 
 root.mainloop()
