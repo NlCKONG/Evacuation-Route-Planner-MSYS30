@@ -28,7 +28,33 @@ result_label.grid(row=1, column=0, sticky=(tk.W, tk.E))
 map_canvas = tk.Canvas(root, width=800, height=600, bg="white")
 map_canvas.grid(row=2, column=0, padx=10, pady=10)
 
-# Ensure all your graph classes/functions are included here
+# --- NEW LEGEND FRAME (Positioned right of the map) ---
+legend_frame = ttk.Frame(root, padding="10", relief="groove")
+legend_frame.grid(row=2, column=1, padx=10, pady=10, sticky="n")
+
+# --- Legend Title ---
+ttk.Label(legend_frame, text="Node Label Legend", font=('Arial', 10, 'bold')).grid(row=0, column=0, columnspan=2, pady=(0, 5))
+ttk.Separator(legend_frame, orient='horizontal').grid(row=1, column=0, columnspan=2, sticky="ew")
+
+# --- Node Mapping Entries ---
+legend_row = 2
+
+for key, name in NODE_KEY_MAPPING:
+    # Column 0: Node Key (Bold)
+    ttk.Label(
+        legend_frame, 
+        text=key, 
+        font=('Arial', 8, 'bold')
+    ).grid(row=legend_row, column=0, padx=5, pady=1, sticky="w")
+    
+    # Column 1: Building Name
+    ttk.Label(
+        legend_frame, 
+        text=name,
+        font=('Arial', 8)
+    ).grid(row=legend_row, column=1, padx=5, pady=1, sticky="w")
+    
+    legend_row += 1
 
 # --- Drawing Functions ---
 
@@ -61,7 +87,12 @@ def draw_nodes_and_edges():
         # Add the label
         map_canvas.create_text(
             x + NODE_RADIUS + 5, 
-            y, text=key, tags=(key, "label"))
+            y, 
+            text=key, 
+            tags=(key, "label"),
+            fill=LABEL_COLOR,
+            font=LABEL_FONT,
+            anchor="w")
 
 # --- Pathfinding and Display Logic ---
 
@@ -95,19 +126,6 @@ def draw_path(path: list[str]):
         x1, y1 = NODE_POSITIONS[u]
         x2, y2 = NODE_POSITIONS[v]
         map_canvas.create_line(x1, y1, x2, y2, fill=PATH_COLOR, width=PATH_WIDTH, tags="path_line")
-        
-    # Ensure nodes and labels are on top of highlighted path
-    map_canvas.tag_raise("node")
-    map_canvas.tag_raise("label")
-    
-    # Highlight the start node
-    start_key = path[0]
-    x, y = NODE_POSITIONS[start_key]
-    map_canvas.create_oval(
-        x - NODE_RADIUS, y - NODE_RADIUS, 
-        x + NODE_RADIUS, y + NODE_RADIUS, 
-        fill=START_NODE_COLOR, outline="black", width=2, tags=("path_line", start_key)
-    )
 
     # Highlight the end node (EAA)
     end_key = path[-1]
@@ -115,7 +133,20 @@ def draw_path(path: list[str]):
     map_canvas.create_oval(
         x - NODE_RADIUS - 2, y - NODE_RADIUS - 2, 
         x + NODE_RADIUS + 2, y + NODE_RADIUS + 2, 
-        outline="black", width=4, tags=("path_line", end_key)
+        outline="orange", width=4, tags=("path_line", end_key)
+    )
+
+    # Ensure nodes and labels are on top of highlighted path
+    map_canvas.tag_raise("node")
+    map_canvas.tag_raise("label")
+
+    # Highlight the start node
+    start_key = path[0]
+    x, y = NODE_POSITIONS[start_key]
+    map_canvas.create_oval(
+        x - NODE_RADIUS, y - NODE_RADIUS, 
+        x + NODE_RADIUS, y + NODE_RADIUS, 
+        fill=START_NODE_COLOR, outline="orange", width=2, tags=("path_line", start_key)
     )
 
 def handle_canvas_click(event):
