@@ -149,7 +149,7 @@ NODE_RADIUS = 7
 START_NODE_COLOR = 'green'
 EAA_NODE_COLOR = 'yellow'
 DEFAULT_NODE_COLOR = 'red'
-PATH_COLOR = 'blue'
+PATH_COLOR = 'orange'
 PATH_WIDTH = 3
 
 # Global variable to store the currently selected start node

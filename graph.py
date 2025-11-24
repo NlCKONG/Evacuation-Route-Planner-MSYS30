@@ -9,7 +9,7 @@ from PIL import Image, ImageTk
 root = tk.Tk()
 root.title("ADMU Evacuation Route Planner")
 
-campus_map = Image.open("Ateneo College Map.jpg")
+campus_map = Image.open("Ateneo College Map.png")
 campus_map = campus_map.resize((800, 600))
 campus_map_tk = ImageTk.PhotoImage(campus_map)
 
@@ -45,7 +45,7 @@ def draw_nodes_and_edges():
     for u, v, _ in EDGE_LIST:
         x1, y1 = NODE_POSITIONS[u]
         x2, y2 = NODE_POSITIONS[v]
-        map_canvas.create_line(x1, y1, x2, y2, fill="gray", width=1)
+        map_canvas.create_line(x1, y1, x2, y2, fill="blue", width=1)
 
     # 2. Draw Nodes
     for key, (x, y) in NODE_POSITIONS.items():
@@ -84,7 +84,7 @@ def find_nearest_eaa(start_node: str):
 
 def draw_path(path: list[str]):
     """Highlights the calculated shortest path."""
-    map_canvas.delete("path_line") # Clear old path lines
+    draw_nodes_and_edges()
     
     if len(path) < 2:
         return
@@ -96,8 +96,9 @@ def draw_path(path: list[str]):
         x2, y2 = NODE_POSITIONS[v]
         map_canvas.create_line(x1, y1, x2, y2, fill=PATH_COLOR, width=PATH_WIDTH, tags="path_line")
         
-    # Re-draw all nodes on top of the path to keep them visible
-    draw_nodes_and_edges()
+    # Ensure nodes and labels are on top of highlighted path
+    map_canvas.tag_raise("node")
+    map_canvas.tag_raise("label")
     
     # Highlight the start node
     start_key = path[0]
