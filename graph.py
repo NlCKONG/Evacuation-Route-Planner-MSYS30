@@ -236,37 +236,43 @@ def path_to_steps(path: list[str]) -> tuple[list[tuple[str,str,float]], float]:
 
 
 
-# Drawing Function
-def draw_nodes_and_edges():
-    map_canvas.delete("all")
-    map_canvas.create_image(0, 0, image=campus_map_tk, anchor="nw", tags="bg")
-    map_canvas.tag_lower("bg")
+# --- Drawing Functions ---
 
-    # Edges
+def draw_nodes_and_edges():
+    """Draws the entire graph on the canvas."""
+    map_canvas.delete("all") # Clear previous drawings
+
+    #Background
+    map_canvas.create_image(0, 0, image=campus_map_tk, anchor="nw", tags = "bg")
+
+    map_canvas.tag_lower("bg")
+    
+    # 1. Draw Edges (Simple straight lines between coordinates)
     for u, v, _ in EDGE_LIST:
         x1, y1 = NODE_POSITIONS[u]
         x2, y2 = NODE_POSITIONS[v]
-        map_canvas.create_line(x1, y1, x2, y2, fill="#3178c6", width=1)
+        map_canvas.create_line(x1, y1, x2, y2, fill="blue", width=1)
 
-    # Nodes
-    # Nodes
+    # 2. Draw Nodes
     for key, (x, y) in NODE_POSITIONS.items():
         color = EAA_NODE_COLOR if key in EAA_NODES else DEFAULT_NODE_COLOR
-
+        
+        # Draw the circle (oval is used for circles in Tkinter)
         map_canvas.create_oval(
-            x-NODE_RADIUS, y-NODE_RADIUS,
-            x+NODE_RADIUS, y+NODE_RADIUS,
-            fill=color, outline="#333", tags=("node", key)
+            x - NODE_RADIUS, y - NODE_RADIUS, 
+            x + NODE_RADIUS, y + NODE_RADIUS, 
+            fill=color, tags=(key, "node") # Assign the node key as a tag
         )
-
+        
+        # Add the label
         map_canvas.create_text(
-            x + NODE_RADIUS + 5, y,
-            text=key,
-            fill="black",
-            tags=("label", key),
-            anchor="w",
-            font=("Segoe UI", 8)
-        )
+            x + NODE_RADIUS + 5, 
+            y, 
+            text=key, 
+            tags=(key, "label"),
+            fill=LABEL_COLOR,
+            font=LABEL_FONT,
+            anchor="w")
 
 
 #map scaling
@@ -341,43 +347,40 @@ def find_nearest_area(start_node: str):
 
     return shortest_path, min_cost, best_eaa
 
-# Path Drawing
-def draw_path(path):
+def draw_path(path: list[str]):
+    """Highlights the calculated shortest path."""
     draw_nodes_and_edges()
+    
+    if len(path) < 2:
+        return
 
-    for i in range(len(path)-1):
+    # Draw line segments for the path
+    for i in range(len(path) - 1):
         u, v = path[i], path[i+1]
         x1, y1 = NODE_POSITIONS[u]
         x2, y2 = NODE_POSITIONS[v]
+        map_canvas.create_line(x1, y1, x2, y2, fill=PATH_COLOR, width=PATH_WIDTH, tags="path_line")
 
-        map_canvas.create_line(
-            x1, y1, x2, y2,
-            fill="#00d1ff",
-            width=6,
-            tags="path_line"
-        )
+    # Highlight the end node (EAA)
+    end_key = path[-1]
+    x, y = NODE_POSITIONS[end_key]
+    map_canvas.create_oval(
+        x - NODE_RADIUS - 2, y - NODE_RADIUS - 2, 
+        x + NODE_RADIUS + 2, y + NODE_RADIUS + 2, 
+        outline="orange", width=4, tags=("path_line", end_key)
+    )
 
-    # Raise nodes & labels above path
+    # Ensure nodes and labels are on top of highlighted path
     map_canvas.tag_raise("node")
     map_canvas.tag_raise("label")
 
-    # highlight start & end
-    sx, sy = NODE_POSITIONS[path[0]]
-    ex, ey = NODE_POSITIONS[path[-1]]
-
+    # Highlight the start node
+    start_key = path[0]
+    x, y = NODE_POSITIONS[start_key]
     map_canvas.create_oval(
-        sx-8, sy-8, sx+8, sy+8,
-        fill="#ff4444",
-        outline="black",
-        width=2,
-        tags="path_line"
-    )
-
-    map_canvas.create_oval(
-        ex-10, ey-10, ex+10, ey+10,
-        outline="orange",
-        width=3,
-        tags="path_line"
+        x - NODE_RADIUS, y - NODE_RADIUS, 
+        x + NODE_RADIUS, y + NODE_RADIUS, 
+        fill=START_NODE_COLOR, outline="orange", width=2, tags=("path_line", start_key)
     )
 
 # Click Handler
