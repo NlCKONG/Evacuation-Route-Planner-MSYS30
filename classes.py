@@ -119,43 +119,73 @@ EDGE_LIST = [
 # NOTE: We need to still fix the positions to match the actual campus map
 # NOTE: And maybe add the campus map to the background of the canvas
 NODE_POSITIONS = {
-    'X1': (300, 100),     # Bellarmine Field
-    'X2': (300, 550),     # Baseball Field
-    'X3': (750, 500),     # Ocampo Field
-    'BEL': (350, 150),    # Bellarmine Hall
-    'ISO': (150, 250),    # ISO Complex
-    'SDC': (250, 300),    # SDC Complex
-    'XV': (400, 200),     # Xavier Hall
-    'FB': (400, 250),     # Faber Hall
-    'O': (400, 350),      # Old Rizal Library
-    'M': (500, 300),      # MVP Center
-    'K': (450, 250),      # Kostka Hall
-    'B': (500, 250),      # Berchmans Hall
-    'G': (550, 300),      # Gonzaga Hall
-    'C': (550, 350),      # Schmitt Hall
-    'P': (600, 350),      # PIPAC
-    'F': (550, 500),      # Faura
-    'D': (500, 500),      # Dela Costa Hall
-    'SS': (350, 400),     # SOSS Building
-    'LH': (300, 450),     # Leong Hall
-    'N': (400, 500),      # New Rizal Library
-    'SEC-A': (600, 400),  # SEC A
-    'SEC-BC': (650, 400), # SEC B and SEC C
-    'MR': (700, 450),     # Matteo Ricci
-    'JSEC': (700, 500),   # JSEC
-    'CTC-SOM': (650, 350) # CTC SOM
+    'X1': (269, 131),     # Bellarmine Field 
+    'X2': (341, 527),     # Baseball Field 
+    'X3': (667, 380),     # Ocampo Field
+    'BEL': (140, 41),    # Bellarmine Hall 
+    'ISO': (112, 165),    # ISO Complex 
+    'SDC': (180, 256),    # SDC Complex 
+    'XV': (327, 188),     # Xavier Hall 
+    'FB': (298, 258),     # Faber Hall 
+    'O': (289, 312),      # Old Rizal Library 
+    'M': (359, 314),      # MVP Center 
+    'K': (348, 234),      # Kostka Hall 
+    'B': (382, 183),      # Berchmans Hall 
+    'G': (443, 236),      # Gonzaga Hall 
+    'C': (415, 300),      # Schmitt Hall 
+    'P': (444, 384),      # PIPAC 
+    'F': (380, 391),      # Faura 
+    'D': (326, 391),      # Dela Costa Hall 
+    'SS': (246, 381),     # SOSS Building 
+    'LH': (259, 443),     # Leong Hall 
+    'N': (319, 451),      # New Rizal Library
+    'SEC-A': (547, 273),  # SEC A
+    'SEC-BC': (530, 349), # SEC B and SEC C
+    'MR': (597, 355),     # Matteo Ricci
+    'JSEC': (572, 412),   # JSEC
+    'CTC-SOM': (523, 456) # CTC SOM
 }
+
+NODE_KEY_MAPPING = [
+    ('X1', 'Bellarmine Field (EAA)'),
+    ('X2', 'Baseball Field (EAA)'),
+    ('X3', 'Ocampo Field (EAA)'),
+    ('BEL', 'Bellarmine Hall'),
+    ('ISO', 'ISO Complex'),
+    ('SDC', 'SDC Complex'),
+    ('XV', 'Xavier Hall'),
+    ('FB', 'Faber Hall'),
+    ('O', 'Old Rizal Library'),
+    ('M', 'MVP Center'),
+    ('K', 'Kostka Hall'),
+    ('B', 'Berchmans Hall'),
+    ('G', 'Gonzaga Hall'),
+    ('C', 'Schmitt Hall'),
+    ('P', 'PIPAC'),
+    ('F', 'Faura'),
+    ('D', 'Dela Costa Hall'),
+    ('SS', 'SOSS Building'),
+    ('LH', 'Leong Hall'),
+    ('N', 'New Rizal Library'),
+    ('SEC-A', 'SEC A'),
+    ('SEC-BC', 'SEC B and SEC C'),
+    ('MR', 'Matteo Ricci'),
+    ('JSEC', 'JSEC'),
+    ('CTC-SOM', 'CTC SOM')
+]
+
 NODE_RADIUS = 7
 START_NODE_COLOR = 'green'
 EAA_NODE_COLOR = 'yellow'
 DEFAULT_NODE_COLOR = 'red'
 PATH_COLOR = 'orange'
 PATH_WIDTH = 3
+LABEL_COLOR = '#6cff04'
+LABEL_FONT = ('Arial', 10, 'bold')
 
-# Global variable to store the currently selected start node
+# store the currently selected start node
 selected_start_node = None
 
 CAMPUS_GRAPH = Graph(EDGE_LIST)
 ALL_NODES = sorted(list(CAMPUS_GRAPH.vertices.keys()))
 EAA_NODES = ['X1', 'X2', 'X3']
-

@@ -129,6 +129,9 @@ def zoom(factor):
     draw_nodes_scaled()
     draw_edges_scaled()
     draw_current_path_scaled()
+    map_canvas.tag_raise("node")
+    map_canvas.tag_raise("label")
+
 
     map_canvas.config(scrollregion=map_canvas.bbox("all"))
 
@@ -287,16 +290,20 @@ def draw_nodes_scaled():
         map_canvas.create_oval(
             sx - NODE_RADIUS, sy - NODE_RADIUS,
             sx + NODE_RADIUS, sy + NODE_RADIUS,
-            fill=color, outline="#333"
-        )
+            fill=color, outline="#333",
+            tags=("node", key)
+)
 
-        map_canvas.create_text (
+
+        map_canvas.create_text(
             sx + NODE_RADIUS + 5, sy,
             text=key,
             fill="black",
             anchor="w",
             font=("Segoe UI", 8),
-            tags=("label", key) )
+            tags=("label", key)
+        )
+
         
 def draw_path_scaled(path):
     for i in range(len(path) - 1):
@@ -307,11 +314,9 @@ def draw_path_scaled(path):
         map_canvas.create_line(
             x1 * current_scale, y1 * current_scale,
             x2 * current_scale, y2 * current_scale,
-            fill="#00d1ff", width=6
+            fill="#00d1ff", width=6, tags="path_line"
         )
 
-        last_path = path
-        draw_path_scaled(path)
 
 
 def draw_current_path_scaled():
@@ -375,51 +380,49 @@ def draw_path(path):
         tags="path_line"
     )
 
-# -------------------------------
 # Click Handler
-# -------------------------------
 def handle_canvas_click(event):
-    clicked = map_canvas.find_closest(event.x, event.y)
-    tags = map_canvas.gettags(clicked)
+    scaled_x = event.x / current_scale
+    scaled_y = event.y / current_scale
 
-    for tag in tags:
-        if tag in NODE_POSITIONS:
-            start = tag
-            path, cost, area = find_nearest_area(start)
+    #Detect nearest node manually
+    clicked_node = None
 
-            if path:
-                # Update main result label
-                result_label.config(
-                                        text=(
-                                            f"Start: {start}\n"
-                                            f"Nearest area: {area}\n"
-                                            f"Total Cost: {cost:.2f}"
-                                        )
-                                    )
+    for key, (nx, ny) in NODE_POSITIONS.items():
+        if abs(scaled_x - nx) <= NODE_RADIUS*2 and abs(scaled_y - ny) <= NODE_RADIUS*2:
+            clicked_node = key
+            break
 
+    if clicked_node is None:
+        return 
+    
+    start = clicked_node
 
-                # --- ADD STEP-BY-STEP CODE HERE -----------------------
+    path, cost, area = find_nearest_area(start)
 
-                steps, total_cost = path_to_steps(path)
+    if not path:
+        return
 
-                buf_lines = []
-                
+    result_label.config(
+        text=(f"Start: {start}\n"
+              f"Nearest area: {area}\n"
+              f"Total Cost: {cost:.2f}")
+    )
 
-                for idx, (u, v, w) in enumerate(steps, start=1):
-                    buf_lines.append(f"{idx}) {u} → {v}    ({w:.2f})")
+    steps, total_cost = path_to_steps(path)
 
-                buf_lines.append("")
-                buf_lines.append(f"Total: {total_cost:.2f}")
+    buf_lines = []
+    for idx, (u, v, w) in enumerate(steps, start=1):
+        buf_lines.append(f"{idx}) {u} → {v}    ({w:.2f})")
 
-                # Display inside your directions panel
-                directions_text.delete("1.0", "end")
-                directions_text.insert("1.0", "\n".join(buf_lines))
+    buf_lines.append("")
+    buf_lines.append(f"Total: {total_cost:.2f}")
 
-                # ------------------------------------------------------
+    directions_text.delete("1.0", "end")
+    directions_text.insert("1.0", "\n".join(buf_lines))
 
-                draw_path(path)
+    draw_path(path)
 
-            return
 
 def on_hover_enter(event):
     map_canvas.itemconfig("hover", outline="yellow", width=3)
@@ -446,15 +449,12 @@ def fit_view_to_path(self, path, padding=60):
     bbox_w = maxx - minx
     bbox_h = maxy - miny
 
-    # desired visible area size (canvas size)
     cwidth = self.canvas.winfo_width()
     cheight = self.canvas.winfo_height()
     if cwidth <= 0 or cheight <= 0:
         self.root.update_idletasks()
         cwidth = self.canvas.winfo_width()
         cheight = self.canvas.winfo_height()
-
-    # compute scale factor to fit bbox into canvas, with padding
     if bbox_w == 0:
         bbox_w = 1
     if bbox_h == 0:
@@ -463,7 +463,6 @@ def fit_view_to_path(self, path, padding=60):
     scale_x = (cwidth - padding*2) / bbox_w
     scale_y = (cheight - padding*2) / bbox_h
     target_scale = min(scale_x, scale_y, self.max_scale)
-    # compute factor relative to current scale
     factor = target_scale / self.scale
     if factor <= 0:
         factor = 1.0
@@ -471,14 +470,11 @@ def fit_view_to_path(self, path, padding=60):
     # zoom around canvas center
     self.zoom(factor)
 
-    # compute center of bbox (canvas coords)
     cx = (minx + maxx) / 2 * self.scale
     cy = (miny + maxy) / 2 * self.scale
 
-    # compute fractions for xview_moveto / yview_moveto to center cx,cy
     canvas_bbox_width = self.map_tk.width() * self.scale if hasattr(self.map_tk, "width") else self.base_image.width * self.scale
     total_width = max(canvas_bbox_width, cwidth)
-    # fraction = (cx - canvas_visible_width/2) / (canvas_total_width - canvas_visible_width)
     fx = (cx - cwidth / 2) / max(1, (self.base_image.width * self.scale - cwidth))
     fy = (cy - cheight / 2) / max(1, (self.base_image.height * self.scale - cheight))
     fx = max(0.0, min(1.0, fx))
@@ -488,7 +484,6 @@ def fit_view_to_path(self, path, padding=60):
         self.canvas.xview_moveto(fx)
         self.canvas.yview_moveto(fy)
     except Exception:
-        # fallback: center by scan_dragto
         pass
 
 
