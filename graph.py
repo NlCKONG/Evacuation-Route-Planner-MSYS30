@@ -12,7 +12,7 @@ root.title("ADMU Evacuation Route Planner")
 icon = tk.PhotoImage(file="icon.png")
 root.iconphoto(False, icon)
 
-root.configure(bg="#f5f5f5")   # Very light gray for cleaner look
+root.configure(bg="#f5f5f5")
 
 # Global Font
 DEFAULT_FONT = ("Segoe UI", 10)
@@ -174,7 +174,7 @@ def draw_nodes_and_edges():
 
     map_canvas.tag_lower("bg")
     
-    # 1. Draw Edges (Simple straight lines between coordinates)
+    # 1. Draw Edges
     for u, v, _ in EDGE_LIST:
         x1, y1 = NODE_POSITIONS[u]
         x2, y2 = NODE_POSITIONS[v]
@@ -184,11 +184,11 @@ def draw_nodes_and_edges():
     for key, (x, y) in NODE_POSITIONS.items():
         color = EAA_NODE_COLOR if key in EAA_NODES else DEFAULT_NODE_COLOR
         
-        # Draw the circle (oval is used for circles in Tkinter)
+        # Draw the circle
         map_canvas.create_oval(
             x - NODE_RADIUS, y - NODE_RADIUS, 
             x + NODE_RADIUS, y + NODE_RADIUS, 
-            fill=color, tags=(key, "node") # Assign the node key as a tag
+            fill=color, tags=(key, "node")
         )
         
         # Add the label
