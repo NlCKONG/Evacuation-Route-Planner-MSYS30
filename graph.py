@@ -86,7 +86,8 @@ directions_text = tk.Text(
     width=32,
     height=5,
     wrap="word",
-    font=("Segoe UI", 9)
+    font=("Segoe UI", 9),
+    state="disabled"
 )
 directions_text.grid(row=0, column=0, sticky="nsew")
 
@@ -290,8 +291,10 @@ def handle_canvas_click(event):
     buf_lines.append("")
     buf_lines.append(f"Total: {total_cost:.2f}")
 
+    directions_text.config(state="normal")
     directions_text.delete("1.0", "end")
     directions_text.insert("1.0", "\n".join(buf_lines))
+    directions_text.config(state="disabled")
 
     draw_path(path)
 
